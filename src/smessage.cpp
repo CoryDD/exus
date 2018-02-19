@@ -3148,7 +3148,7 @@ int SecureMsgValidate(uint8_t *pHeader, uint8_t *pPayload, uint32_t nPayload)
     {
         if (sha256Hash[31] == 0
             && sha256Hash[30] == 0
-            && (~(sha256Hash[29]) & ((1<<0) || (1<<1) || (1<<2)) ))
+            && (~(sha256Hash[29]) & ((1<<0) | (1<<1) | (1<<2)) ))
         {
             if (fDebugSmsg)
                 LogPrint("smessage", "Hash Valid.\n");
@@ -3214,38 +3214,22 @@ int SecureMsgSetHash(uint8_t *pHeader, uint8_t *pPayload, uint32_t nPayload)
             || !HMAC_Update(&ctx, (uint8_t*) pPayload, nPayload)
             || !HMAC_Update(&ctx, pPayload, nPayload)
             || !HMAC_Final(&ctx, sha256Hash, &nBytes)
-            //|| !HMAC_Final(&ctx, &vchHash[0], &nBytes)
             || nBytes != 32)
             break;
 
-        /*
-        if (CBigNum(vchHash) <= bnTarget)
-        {
-            found = true;
-            if (fDebugSmsg)
-                LogPrint("smessage", "Match %u\n", nonse);
-            break;
-        };
-        */
-
         if (sha256Hash[31] == 0
             && sha256Hash[30] == 0
-            && (~(sha256Hash[29]) & ((1<<0) || (1<<1) || (1<<2)) ))
-        //    && sha256Hash[29] == 0)
+            && (~(sha256Hash[29]) & ((1<<0) | (1<<1) | (1<<2)) ))
         {
             found = true;
-            //if (fDebugSmsg)
-            //    LogPrint("smessage", "Match %u\n", nonse);
             break;
         }
 
-        //if (nonse >= UINT32_MAX)
         if (nonse >= 4294967295U)
         {
             if (fDebugSmsg)
                 LogPrint("smessage", "No match %u\n", nonse);
             break;
-            //return 1;
         }
         nonse++;
     };
@@ -3267,7 +3251,6 @@ int SecureMsgSetHash(uint8_t *pHeader, uint8_t *pPayload, uint32_t nPayload)
     };
 
     memcpy(psmsg->hash, sha256Hash, 4);
-    //memcpy(psmsg->hash, &vchHash[0], 4);
 
     if (fDebugSmsg)
         LogPrint("smessage", "SecureMsgSetHash() took %d ms, nonse %u\n", GetTimeMillis() - nStart, nonse);

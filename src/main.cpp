@@ -197,8 +197,7 @@ bool GetNodeStateStats(NodeId nodeid, CNodeStateStats &stats) {
     return true;
 }
 
-void RegisterNodeSignals(CNodeSignals& nodeSignals)
-{
+void RegisterNodeSignals(CNodeSignals& nodeSignals) {
     nodeSignals.GetHeight.connect(&GetHeight);
     nodeSignals.ProcessMessages.connect(&ProcessMessages);
     nodeSignals.SendMessages.connect(&SendMessages);
@@ -206,8 +205,7 @@ void RegisterNodeSignals(CNodeSignals& nodeSignals)
     nodeSignals.FinalizeNode.connect(&FinalizeNode);
 }
 
-void UnregisterNodeSignals(CNodeSignals& nodeSignals)
-{
+void UnregisterNodeSignals(CNodeSignals& nodeSignals) {
     nodeSignals.GetHeight.disconnect(&GetHeight);
     nodeSignals.ProcessMessages.disconnect(&ProcessMessages);
     nodeSignals.SendMessages.disconnect(&SendMessages);
@@ -228,8 +226,7 @@ bool AbortNode(const std::string &strMessage, const std::string &userMessage) {
 /********************************
  * mapOrphanTransactions
  ********************************/
-bool AddOrphanTx(const CTransaction& tx)
-{
+bool AddOrphanTx(const CTransaction& tx) {
     uint256 hash = tx.GetHash();
     if (mapOrphanTransactions.count(hash))
         return false;
@@ -244,8 +241,7 @@ bool AddOrphanTx(const CTransaction& tx)
 
     size_t nSize = tx.GetSerializeSize(SER_NETWORK, CTransaction::CURRENT_VERSION);
 
-    if (nSize > 5000)
-    {
+    if (nSize > 5000) {
         LogPrint("mempool", "ignoring large orphan tx (size: %u, hash: %s)\n", nSize, hash.ToString());
         return false;
     }
@@ -259,13 +255,11 @@ bool AddOrphanTx(const CTransaction& tx)
     return true;
 }
 
-void static EraseOrphanTx(uint256 hash)
-{
+void static EraseOrphanTx(uint256 hash) {
     map<uint256, CTransaction>::iterator it = mapOrphanTransactions.find(hash);
     if (it == mapOrphanTransactions.end())
         return;
-    BOOST_FOREACH(const CTxIn& txin, it->second.vin)
-    {
+    BOOST_FOREACH(const CTxIn& txin, it->second.vin) {
         map<uint256, set<uint256> >::iterator itPrev = mapOrphanTransactionsByPrev.find(txin.prevout.hash);
         if (itPrev == mapOrphanTransactionsByPrev.end())
             continue;
@@ -276,11 +270,9 @@ void static EraseOrphanTx(uint256 hash)
     mapOrphanTransactions.erase(it);
 }
 
-unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans)
-{
+unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans) {
     unsigned int nEvicted = 0;
-    while (mapOrphanTransactions.size() > nMaxOrphans)
-    {
+    while (mapOrphanTransactions.size() > nMaxOrphans) {
         // Evict a random orphan:
         uint256 randomhash = GetRandHash();
         map<uint256, CTransaction>::iterator it = mapOrphanTransactions.lower_bound(randomhash);
@@ -295,8 +287,7 @@ unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans)
 /********************************
  * CTransaction and CTxIndex
  ********************************/
-bool CTransaction::ReadFromDisk(CTxDB& txdb, const uint256& hash, CTxIndex& txindexRet)
-{
+bool CTransaction::ReadFromDisk(CTxDB& txdb, const uint256& hash, CTxIndex& txindexRet) {
     SetNull();
     if (!txdb.ReadTxIndex(hash, txindexRet))
         return false;
@@ -305,8 +296,7 @@ bool CTransaction::ReadFromDisk(CTxDB& txdb, const uint256& hash, CTxIndex& txin
     return true;
 }
 
-bool CTransaction::ReadFromDisk(CTxDB& txdb, COutPoint prevout, CTxIndex& txindexRet)
-{
+bool CTransaction::ReadFromDisk(CTxDB& txdb, COutPoint prevout, CTxIndex& txindexRet) {
     if (!ReadFromDisk(txdb, prevout.hash, txindexRet))
         return false;
     if (prevout.n >= vout.size())
@@ -317,8 +307,7 @@ bool CTransaction::ReadFromDisk(CTxDB& txdb, COutPoint prevout, CTxIndex& txinde
     return true;
 }
 
-bool CTransaction::ReadFromDisk(CTxDB& txdb, COutPoint prevout)
-{
+bool CTransaction::ReadFromDisk(CTxDB& txdb, COutPoint prevout) {
     CTxIndex txindex;
     return ReadFromDisk(txdb, prevout, txindex);
 }

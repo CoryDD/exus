@@ -6,13 +6,10 @@ file COPYING or http://www.opensource.org/licenses/mit-license.php.
 */
 #include <boost/assign/list_of.hpp> // for 'map_list_of()'
 #include <boost/foreach.hpp>
-
 #include "checkpoints.h"
-
 #include "txdb.h"
 #include "main.h"
 #include "uint256.h"
-
 
 static const int nCheckpointSpan = 5000;
 
