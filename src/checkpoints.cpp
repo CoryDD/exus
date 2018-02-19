@@ -20,20 +20,13 @@ namespace Checkpoints
 {
     typedef std::map<int, uint256> MapCheckpoints;
 
-    //
-    // What makes a good checkpoint block?
-    // + Is surrounded by blocks with reasonable timestamps
-    //   (no blocks before with a timestamp after, none after with
-    //    timestamp before)
-    // + Contains no strange transactions
-    //
     static MapCheckpoints mapCheckpoints =
         boost::assign::map_list_of
-    (     0, uint256("0x0000087255ed4502c752369b4dfcd7e500240efc48fe9f705a0670ce873721b2") )
-    //(     0, uint256("0x00000a336bf3e2be21c2ce9a3f9bc9849c697475d0de85e201bdc3452f3c343b") )
-    //( 10000, uint256("0x1cbd7af1430109200bda6ca6a0b94b5771c28819518a201ef96eb0859afca006") )
-    //( 20000, uint256("0x8ca1f8beca3f6fd966cc83495f367be55ef3460e63abdf692e22e279a47fbe71") )
-
+    (     0, uint256("0x0000088e39f7f205701afd80597d455da6c775463bf8d72d6a45bab2160ea929") )
+    (  5000, uint256("0x2205d4b5d9536117b564682e6c93783c8d69296de7ce6b0b13278994e431263a") )
+    ( 10000, uint256("0x9facf454cfedddb0263b4444c00393662882d8d1350d3f44c18b4b6102b9ba96") )
+    ( 15000, uint256("0x0a91b5106b97f85adf0127b3c8f5dfbc989289a14e64527c0e168a6168c2744e") )
+    ( 20000, uint256("0xd437eba908f9201627e88fbd84b1777918be1d8f6f9b878e4663f4d74c7dc938") )
     ;
 
     // TestNet has no checkpoints
