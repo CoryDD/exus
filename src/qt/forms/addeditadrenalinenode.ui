@@ -26,7 +26,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Complete the form below:&lt;br/&gt;- Alias (friendly name) for your Master Node&lt;br/&gt;- Master Node IP address and port in the format 12.34.56.78:9999&lt;br/&gt;- Master Node private key&lt;br/&gt;- TxHash of 5000 EXUS sent to the collateral address&lt;br/&gt;- Output Index &lt;br/&gt;- Reward Address (optional)&lt;br/&gt;- Reward % (optional)&lt;br/&gt;NOTE: You must send exactly 5000 EXUS to the collateral address.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Complete the form below:&lt;br/&gt;- Alias (friendly name) for your Master Node&lt;br/&gt;- Master Node IP address and port in the format 12.34.56.78:9999&lt;br/&gt;- Master Node private key&lt;br/&gt;- TxHash&lt;br/&gt;- Output Index &lt;br/&gt;- Reward Address (optional)&lt;br/&gt;- Reward % (optional)&lt;br/&gt;NOTE: You must send exactly 5000 EXUS to the collateral address.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -189,6 +189,12 @@
      </property>
      <item>
       <widget class="QLabel" name="label_3">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="text">
         <string>Reward Address</string>
        </property>
