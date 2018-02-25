@@ -748,8 +748,28 @@ Value masternode(const Array& params, bool fHelp)
     return Value::null;
 }
 
-Value masternodelist(const Array& params, bool fHelp)
-{
+/**
+Get a list of masternodes in different modes
+
+Arguments:
+1. "mode"      (string, optional/required to use filter, defaults = status) The mode to run list in
+2. "filter"    (string, optional) Filter results. Partial match by IP by default in all modes, additional matches in some modes
+
+Available modes:
+  activeseconds   - Print number of seconds masternode recognized by the network as enabled
+  reward          - Show reward settings
+  full            - Print info in format 'status protocol pubkey vin lastseen activeseconds' (can be additionally filtered, partial match)
+  lastseen        - Print timestamp of when a masternode was last seen on the network
+  protocol        - Print protocol of a masternode (can be additionally filtered, exact match)
+  pubkey          - Print public key associated with a masternode (can be additionally filtered, partial match)
+  rank            - Print rank of a masternode based on current block
+  status          - Print masternode status: ENABLED / EXPIRED / VIN_SPENT / REMOVE / POS_ERROR (can be additionally filtered, partial match)
+  addr            - Print ip address associated with a masternode (can be additionally filtered, partial match)
+  votes           - Print all masternode votes for a Exus initiative (can be additionally filtered, partial match)
+  lastpaid        - The last time a node was paid on the network
+  masternodecount - Masternode count
+ */
+Value masternodelist(const Array& params, bool fHelp) {
     std::string strMode = "status";
     std::string strFilter = "";
 
@@ -757,8 +777,18 @@ Value masternodelist(const Array& params, bool fHelp)
     if (params.size() == 2) strFilter = params[1].get_str();
 
     if (fHelp ||
-            (strMode != "activeseconds" && strMode != "reward" && strMode != "full" && strMode != "lastseen" && strMode != "protocol"
-                && strMode != "pubkey" && strMode != "rank" && strMode != "status" && strMode != "addr" && strMode != "votes" && strMode != "lastpaid"))
+            (strMode != "activeseconds"
+            && strMode != "reward"
+            && strMode != "full"
+            && strMode != "lastseen"
+            && strMode != "protocol"
+            && strMode != "pubkey"
+            && strMode != "rank"
+            && strMode != "status"
+            && strMode != "addr"
+            && strMode != "votes"
+            && strMode != "lastpaid"
+            && strMode != "masternodecount"))
     {
         throw runtime_error(
                 "masternodelist ( \"mode\" \"filter\" )\n"
@@ -767,17 +797,18 @@ Value masternodelist(const Array& params, bool fHelp)
                 "1. \"mode\"      (string, optional/required to use filter, defaults = status) The mode to run list in\n"
                 "2. \"filter\"    (string, optional) Filter results. Partial match by IP by default in all modes, additional matches in some modes\n"
                 "\nAvailable modes:\n"
-                "  activeseconds  - Print number of seconds masternode recognized by the network as enabled\n"
-                "  reward         - Show reward settings\n"
-                "  full           - Print info in format 'status protocol pubkey vin lastseen activeseconds' (can be additionally filtered, partial match)\n"
-                "  lastseen       - Print timestamp of when a masternode was last seen on the network\n"
-                "  protocol       - Print protocol of a masternode (can be additionally filtered, exact match)\n"
-                "  pubkey         - Print public key associated with a masternode (can be additionally filtered, partial match)\n"
-                "  rank           - Print rank of a masternode based on current block\n"
-                "  status         - Print masternode status: ENABLED / EXPIRED / VIN_SPENT / REMOVE / POS_ERROR (can be additionally filtered, partial match)\n"
-                "  addr           - Print ip address associated with a masternode (can be additionally filtered, partial match)\n"
-                "  votes          - Print all masternode votes for a Exus initiative (can be additionally filtered, partial match)\n"
-                "  lastpaid       - The last time a node was paid on the network\n"
+                "  activeseconds   - Print number of seconds masternode recognized by the network as enabled\n"
+                "  reward          - Show reward settings\n"
+                "  full            - Print info in format 'status protocol pubkey vin lastseen activeseconds' (can be additionally filtered, partial match)\n"
+                "  lastseen        - Print timestamp of when a masternode was last seen on the network\n"
+                "  protocol        - Print protocol of a masternode (can be additionally filtered, exact match)\n"
+                "  pubkey          - Print public key associated with a masternode (can be additionally filtered, partial match)\n"
+                "  rank            - Print rank of a masternode based on current block\n"
+                "  status          - Print masternode status: ENABLED / EXPIRED / VIN_SPENT / REMOVE / POS_ERROR (can be additionally filtered, partial match)\n"
+                "  addr            - Print ip address associated with a masternode (can be additionally filtered, partial match)\n"
+                "  votes           - Print all masternode votes for a Exus initiative (can be additionally filtered, partial match)\n"
+                "  lastpaid        - The last time a node was paid on the network\n"
+                "  masternodecount - Masternode count\n"
                 );
     }
 
@@ -789,6 +820,11 @@ Value masternodelist(const Array& params, bool fHelp)
             if(strFilter !="" && strVin.find(strFilter) == string::npos) continue;
             obj.push_back(Pair(strVin,       s.first));
         }
+
+    } else if (strMode == "masternodecount") {
+        std::vector<CMasternode> vMasternodes = mnodeman.GetFullMasternodeVector();
+        int count = vMasternodes.size();
+        obj.push_back(Pair("masternodecount",       count));
     } else {
         std::vector<CMasternode> vMasternodes = mnodeman.GetFullMasternodeVector();
         BOOST_FOREACH(CMasternode& mn, vMasternodes) {
