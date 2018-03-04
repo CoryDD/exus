@@ -36,10 +36,10 @@ public:
 
 private:
     QMenu* contextMenu;
-    
+
 public slots:
     void updateNodeList();
-    void updateAdrenalineNode(QString alias, QString addr, QString privkey, QString txHash, QString txIndex, QString rewardAddress, QString rewardPercentage, QString status);
+    void updateExusNode(QString alias, QString addr, QString privkey, QString txHash, QString txIndex, QString rewardAddress, QString rewardPercentage, QString status);
     void on_UpdateButton_clicked();
     void copyAddress();
     void copyPubkey();
@@ -55,6 +55,8 @@ private:
 
 private slots:
     void showContextMenu(const QPoint&);
+    void on_editButton_clicked();
+    void on_removeButton_clicked();
     void on_createButton_clicked();
     void on_startButton_clicked();
     void on_startAllButton_clicked();

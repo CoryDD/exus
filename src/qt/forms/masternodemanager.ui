@@ -230,13 +230,6 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="UpdateButton">
-               <property name="text">
-                <string>&amp;Update</string>
-               </property>
-              </widget>
-             </item>
-             <item>
               <spacer name="horizontalSpacer_2">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -274,6 +267,13 @@
               <widget class="QPushButton" name="startAllButton">
                <property name="text">
                 <string>St&amp;art All</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="UpdateButton">
+               <property name="text">
+                <string>&amp;Update</string>
                </property>
               </widget>
              </item>

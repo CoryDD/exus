@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>530</width>
+    <width>615</width>
     <height>450</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>615</width>
+    <height>450</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Add/Edit Exus Node</string>
@@ -48,7 +54,7 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>100</width>
+         <width>130</width>
          <height>0</height>
         </size>
        </property>
@@ -81,7 +87,7 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>100</width>
+         <width>130</width>
          <height>0</height>
         </size>
        </property>
@@ -110,7 +116,7 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>100</width>
+         <width>130</width>
          <height>0</height>
         </size>
        </property>
@@ -139,7 +145,7 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>100</width>
+         <width>130</width>
          <height>0</height>
         </size>
        </property>
@@ -168,7 +174,7 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>100</width>
+         <width>130</width>
          <height>0</height>
         </size>
        </property>
@@ -178,7 +184,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="outputindexLineEdit"/>
+      <widget class="QLineEdit" name="outputindexLineEdit">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -189,9 +199,15 @@
      </property>
      <item>
       <widget class="QLabel" name="label_3">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
-         <width>100</width>
+         <width>130</width>
          <height>0</height>
         </size>
        </property>
@@ -202,11 +218,20 @@
      </item>
      <item>
       <widget class="QLineEdit" name="rewardaddressLineEdit">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>441</width>
+         <height>0</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -227,7 +252,7 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>100</width>
+         <width>130</width>
          <height>0</height>
         </size>
        </property>

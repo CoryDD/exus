@@ -3,7 +3,6 @@
 #include "masternodeconfig.h"
 #include "masternodemanager.h"
 #include "ui_masternodemanager.h"
-
 #include "walletdb.h"
 #include "wallet.h"
 #include "ui_interface.h"
@@ -20,9 +19,6 @@ AddEditAdrenalineNode::AddEditAdrenalineNode(QWidget *parent) :
     ui(new Ui::AddEditAdrenalineNode)
 {
     ui->setupUi(this);
-
-
-
 
     //Labels
     ui->aliasLineEdit->setPlaceholderText("Enter your Masternode alias");
