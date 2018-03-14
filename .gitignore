@@ -5,5 +5,8 @@ release/
 .DS_Store
 .qmake.stash
 qrc_bitcoin.cpp
-
+*.log
+config.log
+config.status
+src/secp256k1/Makefile
 

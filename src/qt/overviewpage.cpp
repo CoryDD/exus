@@ -385,18 +385,11 @@ void OverviewPage::updateDarksendProgress()
         strAmountAndRounds = strAnonymizeExusAmount + " / " + tr("%n Rounds", "", nDarksendRounds);
     } else {
         QString strMaxToAnonymize = BitcoinUnits::formatHtmlWithUnit(nDisplayUnit, nMaxToAnonymize, false, BitcoinUnits::separatorAlways);
-        // ui->labelAmountRounds->setToolTip(tr("Not enough compatible inputs to anonymize <span style='color:red;'>%1</span>,<br>"
-        //                                      "will anonymize <span style='color:red;'>%2</span> instead")
-        //                                   .arg(strAnonymizeExusAmount)
-        //                                   .arg(strMaxToAnonymize));
         ui->labelAmountRounds->setToolTip(tr("Not enough compatible inputs to anonymize %1,<br>"
                                              "will anonymize %2 instead")
                                           .arg(strAnonymizeExusAmount)
                                           .arg(strMaxToAnonymize));
         strMaxToAnonymize = strMaxToAnonymize.remove(strMaxToAnonymize.indexOf("."), BitcoinUnits::decimals(nDisplayUnit) + 1);
-        // strAmountAndRounds = "<span style='color:red;'>" +
-        //         QString(BitcoinUnits::factor(nDisplayUnit) == 1 ? "" : "~") + strMaxToAnonymize +
-        //         " / " + tr("%n Rounds", "", nDarksendRounds) + "</span>";
         strAmountAndRounds = QString(BitcoinUnits::factor(nDisplayUnit) == 1 ? "" : "~") + strMaxToAnonymize +
                 " / " + tr("%n Rounds", "", nDarksendRounds);
     }

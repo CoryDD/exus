@@ -136,7 +136,7 @@ public:
 
         nPoolMaxTransactions = 3;
         strDarksendPoolDummyAddress = "KqCw84AwFKfF4HcxcMMAJwsvd8dRQ7LtMx";
-        nLastPOWBlock = 10368000;
+        nLastPOWBlock = 120000;
         nPOSStartBlock = 2;
     }
 
@@ -222,7 +222,7 @@ public:
 
         convertSeeds(vFixedSeeds, pnTestnetSeed, ARRAYLEN(pnTestnetSeed), nDefaultPort);
 
-        nLastPOWBlock = 10368000;
+        nLastPOWBlock = 120000;
     }
     virtual Network NetworkID() const { return CChainParams::TESTNET; }
 };

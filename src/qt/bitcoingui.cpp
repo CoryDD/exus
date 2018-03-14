@@ -1,6 +1,6 @@
 /*
  * Qt5 Exus GUI
- * Main bacground color: #414142
+ * Main bacground color: #3a3a3c (old: #414142)
  *
  * W.J. van der Laan 2011-2012
  * The Bitcoin Developers 2011-2012
@@ -455,7 +455,7 @@ void BitcoinGUI::createToolBars()
                            "QToolButton:hover { background-color: #57575b; border: none; padding-top: 3px; padding-bottom: 3px; }"
                            "QToolButton:checked { background-color: #6d6d74; border: none; padding-top: 3px; padding-bottom: 3px; }"
                            "QToolButton:pressed { background-color: #6d6d74; border: none; padding-top: 3px; padding-bottom: 3px; }"
-                           "#tabs { color: #ffffff; background-color: #414142; border: none; padding-top: 0px; padding-bottom: 0px; }");
+                           "#tabs { color: #ffffff; background-color: #3a3a3c; border: none; padding-top: 0px; padding-bottom: 0px; }");
 
 
 

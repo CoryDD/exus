@@ -139,52 +139,51 @@ void ResendWalletTransactions(bool fForce) {
  * Registration of network node signals.
  ********************************/
 namespace {
-// Maintain validation-specific state about nodes, protected by cs_main, instead
-// by CNode's own locks. This simplifies asynchronous operation, where
-// processing of incoming data is done after the ProcessMessage call returns,
-// and we're no longer holding the node's locks.
-struct CNodeState {
-    // Accumulated misbehaviour score for this peer.
-    int nMisbehavior;
-    // Whether this peer should be disconnected and banned.
-    bool fShouldBan;
-    std::string name;
+  // Maintain validation-specific state about nodes, protected by cs_main, instead
+  // by CNode's own locks. This simplifies asynchronous operation, where
+  // processing of incoming data is done after the ProcessMessage call returns,
+  // and we're no longer holding the node's locks.
+  struct CNodeState {
+      // Accumulated misbehaviour score for this peer.
+      int nMisbehavior;
+      // Whether this peer should be disconnected and banned.
+      bool fShouldBan;
+      std::string name;
 
-    CNodeState() {
-        nMisbehavior = 0;
-        fShouldBan = false;
-    }
-};
+      CNodeState() {
+          nMisbehavior = 0;
+          fShouldBan = false;
+      }
+  };
 
-map<NodeId, CNodeState> mapNodeState;
+  map<NodeId, CNodeState> mapNodeState;
 
-// Requires cs_main.
-CNodeState *State(NodeId pnode) {
-    map<NodeId, CNodeState>::iterator it = mapNodeState.find(pnode);
-    if (it == mapNodeState.end())
-        return NULL;
-    return &it->second;
-}
+  // Requires cs_main.
+  CNodeState *State(NodeId pnode) {
+      map<NodeId, CNodeState>::iterator it = mapNodeState.find(pnode);
+      if (it == mapNodeState.end())
+          return NULL;
+      return &it->second;
+  }
 
-int GetHeight()
-{
-    while(true){
-        TRY_LOCK(cs_main, lockMain);
-        if(!lockMain) { MilliSleep(50); continue; }
-        return pindexBest->nHeight;
-    }
-}
+  int GetHeight() {
+      while(true){
+          TRY_LOCK(cs_main, lockMain);
+          if(!lockMain) { MilliSleep(50); continue; }
+          return pindexBest->nHeight;
+      }
+  }
 
-void InitializeNode(NodeId nodeid, const CNode *pnode) {
-    LOCK(cs_main);
-    CNodeState &state = mapNodeState.insert(std::make_pair(nodeid, CNodeState())).first->second;
-    state.name = pnode->addrName;
-}
+  void InitializeNode(NodeId nodeid, const CNode *pnode) {
+      LOCK(cs_main);
+      CNodeState &state = mapNodeState.insert(std::make_pair(nodeid, CNodeState())).first->second;
+      state.name = pnode->addrName;
+  }
 
-void FinalizeNode(NodeId nodeid) {
-    LOCK(cs_main);
-    mapNodeState.erase(nodeid);
-}
+  void FinalizeNode(NodeId nodeid) {
+      LOCK(cs_main);
+      mapNodeState.erase(nodeid);
+  }
 
 }
 
@@ -299,8 +298,7 @@ bool CTransaction::ReadFromDisk(CTxDB& txdb, const uint256& hash, CTxIndex& txin
 bool CTransaction::ReadFromDisk(CTxDB& txdb, COutPoint prevout, CTxIndex& txindexRet) {
     if (!ReadFromDisk(txdb, prevout.hash, txindexRet))
         return false;
-    if (prevout.n >= vout.size())
-    {
+    if (prevout.n >= vout.size()) {
         SetNull();
         return false;
     }
@@ -312,15 +310,13 @@ bool CTransaction::ReadFromDisk(CTxDB& txdb, COutPoint prevout) {
     return ReadFromDisk(txdb, prevout, txindex);
 }
 
-bool CTransaction::ReadFromDisk(COutPoint prevout)
-{
+bool CTransaction::ReadFromDisk(COutPoint prevout) {
     CTxDB txdb("r");
     CTxIndex txindex;
     return ReadFromDisk(txdb, prevout, txindex);
 }
 
-bool IsStandardTx(const CTransaction& tx, string& reason)
-{
+bool IsStandardTx(const CTransaction& tx, string& reason) {
     if (tx.nVersion > CTransaction::CURRENT_VERSION || tx.nVersion < 1) {
         reason = "version";
         return false;
@@ -363,8 +359,7 @@ bool IsStandardTx(const CTransaction& tx, string& reason)
         return false;
     }
 
-    BOOST_FOREACH(const CTxIn& txin, tx.vin)
-    {
+    BOOST_FOREACH(const CTxIn& txin, tx.vin) {
         // Biggest 'standard' txin is a 15-of-15 P2SH multisig with compressed
         // keys. (remember the 520 byte limit on redeemScript size) That works
         // out to a (15*(33+1))+3=513 byte redeemScript, 513+1+15*(73+1)+3=1627
@@ -390,13 +385,11 @@ bool IsStandardTx(const CTransaction& tx, string& reason)
 
     txnouttype whichType;
     BOOST_FOREACH(const CTxOut& txout, tx.vout) {
-        if (!::IsStandard(txout.scriptPubKey, whichType))
-        {
+        if (!::IsStandard(txout.scriptPubKey, whichType)) {
             reason = "scriptpubkey";
             return false;
         }
-        if (whichType == TX_NULL_DATA)
-        {
+        if (whichType == TX_NULL_DATA) {
             nDataOut++;
         } else if (txout.nValue == 0) {
             reason = "dust";
@@ -418,8 +411,7 @@ bool IsStandardTx(const CTransaction& tx, string& reason)
     return true;
 }
 
-bool IsFinalTx(const CTransaction &tx, int nBlockHeight, int64_t nBlockTime)
-{
+bool IsFinalTx(const CTransaction &tx, int nBlockHeight, int64_t nBlockTime) {
     AssertLockHeld(cs_main);
     // Time based nLockTime implemented in 0.1.6
     if (tx.nLockTime == 0)
@@ -439,14 +431,12 @@ bool IsFinalTx(const CTransaction &tx, int nBlockHeight, int64_t nBlockTime)
 /********************************
  * POW POS and MASTERNODES
  ********************************/
+static CBigNum GetProofOfStakeLimit(int nHeight) {
+  return bnProofOfStakeLimit;
+}
 
- static CBigNum GetProofOfStakeLimit(int nHeight)
- {
-     return bnProofOfStakeLimit;
- }
-
- // Miner's coin base reward
- int64_t GetProofOfWorkReward(int nHeight, int64_t nFees) {
+// Miner's coin base reward
+int64_t GetProofOfWorkReward(int nHeight, int64_t nFees) {
 
  	int64_t nSubsidy = 1 * COIN;
 
@@ -456,172 +446,141 @@ bool IsFinalTx(const CTransaction &tx, int nBlockHeight, int64_t nBlockTime)
  	else if (nHeight >= 2 && nHeight < 1441) {
  	  nSubsidy = 1 * COIN;           // to prevent instamine for 24 hours
  	}
- 	else if (nHeight >= 1441 && nHeight < 1036801) {
- 	  nSubsidy = 10 * COIN;          // 10.0        EXUS for years 1 - 2
+ 	else if (nHeight >= 1441 && nHeight < 120001) {
+ 	  nSubsidy = 10 * COIN;
  	}
- 	else if (nHeight >= 1036801 && nHeight < 2073601)
- 	{
- 	  nSubsidy = 5 * COIN;           //  5.0        EXUS for years 3 - 4
+  else {
+ 	  nSubsidy = 0 * COIN;
  	}
- 	else if (nHeight >= 2073601 && nHeight < 3110401)
- 	{
- 	  nSubsidy = 2.5 * COIN;         //  2.50       EXUS for years 5 - 6
- 	}
- 	else if (nHeight >= 3110401 && nHeight < 4147201)
- 	{
- 	  nSubsidy = 1.25 * COIN;        //  1.25       EXUS for years 7 - 8
- 	}
- 	else if (nHeight >= 4147201 && nHeight < 5184001)
- 	{
- 	  nSubsidy = 0.625 * COIN;       //  0.625      EXUS for years 9 - 10
- 	}
- 	else if (nHeight >= 5184001 && nHeight < 6220801)
- 	{
- 	  nSubsidy = 0.3125 * COIN;      //  0.3125     EXUS for years 11 - 12
- 	}
- 	else if (nHeight >= 6220801 && nHeight < 7257601)
- 	{
- 	  nSubsidy = 0.15625 * COIN;     //  0.15625    EXUS for years 13 - 14
- 	}
- 	else if (nHeight >= 7257601 && nHeight < 8294401)
- 	{
- 	  nSubsidy = 0.078125 * COIN;    //  0.078125   EXUS for years 15 - 16
- 	}
- 	else if (nHeight >= 8294401 && nHeight < 9331201)
- 	{
- 	  nSubsidy = 0.0390625 * COIN;   //  0.0390625  EXUS for years 17 - 18
- 	}
- 	else if (nHeight >= 9331201 && nHeight < 10368001)
- 	{
- 	  nSubsidy = 0.01953125 * COIN;  //  0.01953125 EXUS for years 19 - 20
- 	}
+
    LogPrint("POW: Block:  ", "%s\n", nHeight);
    LogPrint("POW: Reward: ", "%s EXUS\n", nSubsidy);
  	return nSubsidy + nFees;
- }
+}
 
- // Miner's coin stake reward
- int64_t GetProofOfStakeReward(const CBlockIndex* pindexPrev, int64_t nCoinAge, int64_t nFees)
- {
+// Miner's coin stake reward
+int64_t GetProofOfStakeReward(const CBlockIndex* pindexPrev, int64_t nCoinAge, int64_t nFees) {
    int64_t nSubsidy = 0 * COIN;
 
    if (pindexBest->nHeight+1 > 1 && pindexBest->nHeight+1 < 1441) {
   	  nSubsidy = 1 * COIN;
    }
-   else if (pindexBest->nHeight+1 > 1440 && pindexBest->nHeight+1 <= 1036800)
-   {
+   else if (pindexBest->nHeight+1 > 1440 && pindexBest->nHeight+1 <= 120000) {
      nSubsidy = 10 * COIN;
    }
-   else if (pindexBest->nHeight+1 > 1036800 && pindexBest->nHeight+1 <= 2073600)
-   {
-     nSubsidy = 5 * COIN;
+   else if (pindexBest->nHeight+1 > 120000 && pindexBest->nHeight+1 <= 1036800) {
+     nSubsidy = 10 * 2 * COIN;
    }
-   else if (pindexBest->nHeight+1 > 2073600 && pindexBest->nHeight+1 <= 3110400)
-   {
-     nSubsidy = 2.5 * COIN;
+   else if (pindexBest->nHeight+1 > 1036800 && pindexBest->nHeight+1 <= 2073600) {
+     nSubsidy = 5 * 2 * COIN;
    }
-   else if (pindexBest->nHeight+1 > 3110400 && pindexBest->nHeight+1 <= 4147200)
-   {
-     nSubsidy = 1.25 * COIN;
+   else if (pindexBest->nHeight+1 > 2073600 && pindexBest->nHeight+1 <= 3110400) {
+     nSubsidy = 2.5 * 2 * COIN;
    }
-   else if (pindexBest->nHeight+1 > 4147200 && pindexBest->nHeight+1 <= 5184000)
-   {
-     nSubsidy = 0.625 * COIN;
+   else if (pindexBest->nHeight+1 > 3110400 && pindexBest->nHeight+1 <= 4147200) {
+     nSubsidy = 1.25 * 2 * COIN;
    }
-   else if (pindexBest->nHeight+1 > 5184000 && pindexBest->nHeight+1 <= 6220800)
-   {
-     nSubsidy = 0.3125 * COIN;
+   else if (pindexBest->nHeight+1 > 4147200 && pindexBest->nHeight+1 <= 5184000) {
+     nSubsidy = 0.625 * 2 * COIN;
    }
-   else if (pindexBest->nHeight+1 > 6220800 && pindexBest->nHeight+1 <= 7257600)
-   {
-     nSubsidy = 0.15625 * COIN;
+   else if (pindexBest->nHeight+1 > 5184000 && pindexBest->nHeight+1 <= 6220800) {
+     nSubsidy = 0.3125 * 2 * COIN;
    }
-   else if (pindexBest->nHeight+1 > 7257600 && pindexBest->nHeight+1 <= 8294400)
-   {
-     nSubsidy = 0.078125 * COIN;
+   else if (pindexBest->nHeight+1 > 6220800 && pindexBest->nHeight+1 <= 7257600) {
+     nSubsidy = 0.15625 * 2 * COIN;
    }
-   else if (pindexBest->nHeight+1 > 8294400 && pindexBest->nHeight+1 <= 9331200)
-   {
-     nSubsidy = 0.0390625 * COIN;
+   else if (pindexBest->nHeight+1 > 7257600 && pindexBest->nHeight+1 <= 8294400) {
+     nSubsidy = 0.078125 * 2 * COIN;
    }
-   else if (pindexBest->nHeight+1 > 9331200 && pindexBest->nHeight+1 <= 10368000)
-   {
-     nSubsidy = 0.01953125 * COIN;
+   else if (pindexBest->nHeight+1 > 8294400 && pindexBest->nHeight+1 <= 9331200) {
+     nSubsidy = 0.0390625 * 2 * COIN;
+   }
+   else if (pindexBest->nHeight+1 > 9331200 && pindexBest->nHeight+1 <= 10368000) {
+     nSubsidy = 0.01953125 * 2 * COIN;
    }
    LogPrint("POS Block:  ", "%s\n", pindexBest->nHeight+1);
    LogPrint("POS Reward: ", "%s EXUS\n", nSubsidy);
    return nSubsidy + nFees;
- }
+}
 
- static int64_t nTargetTimespan = 10 * 60;  // 10 mins
+static int64_t nTargetTimespan = 10 * 60;  // 10 mins
 
- // Find last block index up to pindex
- const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfStake)
- {
-     while (pindex && pindex->pprev && (pindex->IsProofOfStake() != fProofOfStake))
-         pindex = pindex->pprev;
-     return pindex;
- }
+// Find last block index up to pindex
+const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfStake) {
+   while (pindex && pindex->pprev && (pindex->IsProofOfStake() != fProofOfStake))
+       pindex = pindex->pprev;
+   return pindex;
+}
 
- unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake)
- {
-     CBigNum bnTargetLimit = fProofOfStake ? GetProofOfStakeLimit(pindexLast->nHeight) : Params().ProofOfWorkLimit();
-     if (pindexLast == NULL)
-         return bnTargetLimit.GetCompact(); // genesis block
-     const CBlockIndex* pindexPrev = GetLastBlockIndex(pindexLast, fProofOfStake);
-     if (pindexPrev->pprev == NULL)
-         return bnTargetLimit.GetCompact(); // first block
-     const CBlockIndex* pindexPrevPrev = GetLastBlockIndex(pindexPrev->pprev, fProofOfStake);
-     if (pindexPrevPrev->pprev == NULL)
-         return bnTargetLimit.GetCompact(); // second block
+unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake) {
+   CBigNum bnTargetLimit = fProofOfStake ? GetProofOfStakeLimit(pindexLast->nHeight) : Params().ProofOfWorkLimit();
+   if (pindexLast == NULL)
+       return bnTargetLimit.GetCompact(); // genesis block
+   const CBlockIndex* pindexPrev = GetLastBlockIndex(pindexLast, fProofOfStake);
+   if (pindexPrev->pprev == NULL)
+       return bnTargetLimit.GetCompact(); // first block
+   const CBlockIndex* pindexPrevPrev = GetLastBlockIndex(pindexPrev->pprev, fProofOfStake);
+   if (pindexPrevPrev->pprev == NULL)
+       return bnTargetLimit.GetCompact(); // second block
 
-     int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
-     if (nActualSpacing < 0) {
-         nActualSpacing = GetTargetSpacing(pindexLast->nHeight, fProofOfStake);
-     }
+   int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
+   if (nActualSpacing < 0) {
+       nActualSpacing = GetTargetSpacing(pindexLast->nHeight, fProofOfStake);
+   }
 
-     /**
-     Target change every block
-     Retarget with exponential moving toward target spacing
-     */
-     CBigNum bnNew;
-     bnNew.SetCompact(pindexPrev->nBits);
-     int64_t nInterval = nTargetTimespan / GetTargetSpacing(pindexLast->nHeight, fProofOfStake);
-     bnNew *= ((nInterval - 1) * GetTargetSpacing(pindexLast->nHeight, fProofOfStake) + nActualSpacing + nActualSpacing);
-     bnNew /= ((nInterval + 1) * GetTargetSpacing(pindexLast->nHeight, fProofOfStake));
+   /**
+   Target change every block
+   Retarget with exponential moving toward target spacing
+   */
+   CBigNum bnNew;
+   bnNew.SetCompact(pindexPrev->nBits);
+   int64_t nInterval = nTargetTimespan / GetTargetSpacing(pindexLast->nHeight, fProofOfStake);
+   bnNew *= ((nInterval - 1) * GetTargetSpacing(pindexLast->nHeight, fProofOfStake) + nActualSpacing + nActualSpacing);
+   bnNew /= ((nInterval + 1) * GetTargetSpacing(pindexLast->nHeight, fProofOfStake));
 
-     if (bnNew <= 0 || bnNew > bnTargetLimit) {
-         bnNew = bnTargetLimit;
-     }
+   if (bnNew <= 0 || bnNew > bnTargetLimit) {
+       bnNew = bnTargetLimit;
+   }
 
-     return bnNew.GetCompact();
- }
+   return bnNew.GetCompact();
+}
 
- bool CheckProofOfWork(uint256 hash, unsigned int nBits)
- {
-     CBigNum bnTarget;
-     bnTarget.SetCompact(nBits);
+bool CheckProofOfWork(uint256 hash, unsigned int nBits) {
+   CBigNum bnTarget;
+   bnTarget.SetCompact(nBits);
 
-     // Check range
-     if (bnTarget <= 0 || bnTarget > Params().ProofOfWorkLimit())
-         return error("CheckProofOfWork() : nBits below minimum work");
+   // Check range
+   if (bnTarget <= 0 || bnTarget > Params().ProofOfWorkLimit())
+       return error("CheckProofOfWork() : nBits below minimum work");
 
-     // Check proof of work matches claimed amount
-     if (hash > bnTarget.getuint256())
-         return error("CheckProofOfWork() : hash doesn't match nBits");
+   // Check proof of work matches claimed amount
+   if (hash > bnTarget.getuint256())
+       return error("CheckProofOfWork() : hash doesn't match nBits");
 
-     return true;
- }
+   return true;
+}
 
- int64_t GetMasternodePayment(int nHeight, int64_t blockValue)
- {
-     int64_t ret = blockValue * 0.92; //92%
+/**
+ * Masternode rewards
+ */
+int64_t GetMasternodePayment(int nHeight, int64_t blockValue) {
+  int64_t ret = blockValue * 0;
+  if (nHeight <= 120000) {
+    ret = blockValue * 0.92;
+  }
+  else if (nHeight > 120000 && nHeight < 10368001) {
+    ret = blockValue * 0.75;
+  }
+  else {
+    ret = blockValue * 0;
+  }
 
-     LogPrint("Masternode Block Value: ", "%s\n", blockValue);
-     LogPrint("Masternode Reward:      ", "%s EXUS\n", ret);
+  LogPrint("Block Height:           ", "%s\n", nHeight);
+  LogPrint("Masternode Block Value: ", "%s\n", blockValue);
+  LogPrint("Masternode Reward:      ", "%s EXUS\n", ret);
 
-     return ret;
- }
+  return ret;
+}
 
 /********************************
  * Check transaction inputs to mitigate two

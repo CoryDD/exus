@@ -55,8 +55,8 @@ private:
 
 private slots:
     void showContextMenu(const QPoint&);
-    void on_editButton_clicked();
-    void on_removeButton_clicked();
+    //void on_editButton_clicked();
+    //void on_removeButton_clicked();
     void on_createButton_clicked();
     void on_startButton_clicked();
     void on_startAllButton_clicked();

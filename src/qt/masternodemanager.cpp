@@ -39,7 +39,7 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->editButton->setEnabled(false);
+    //ui->editButton->setEnabled(false);
     ui->startButton->setEnabled(false);
 
     int columnAddressWidth = 200;
@@ -81,7 +81,7 @@ MasternodeManager::~MasternodeManager() {
 
 void MasternodeManager::on_tableWidget_2_itemSelectionChanged() {
     if(ui->tableWidget_2->selectedItems().count() > 0) {
-        ui->editButton->setEnabled(true);
+        //ui->editButton->setEnabled(true);
         ui->startButton->setEnabled(true);
     }
 }
@@ -129,41 +129,6 @@ static QString seconds_to_DHMS(quint32 duration) {
   return res.sprintf("%dd %02dh:%02dm:%02ds", days, hours, minutes, seconds);
 }
 
-void MasternodeManager::on_editButton_clicked() {
-    QItemSelectionModel* selectionModel = ui->tableWidget_2->selectionModel();
-    QModelIndexList selected = selectionModel->selectedRows();
-    if(selected.count() == 0)
-        return;
-
-    QModelIndex index = selected.at(0);
-    int r = index.row();
-    std::string sAddress = ui->tableWidget_2->item(r, 1)->text().toStdString();
-}
-
-void MasternodeManager::on_removeButton_clicked() {
-    QItemSelectionModel* selectionModel = ui->tableWidget_2->selectionModel();
-    QModelIndexList selected = selectionModel->selectedRows();
-    if(selected.count() == 0)
-        return;
-
-    QMessageBox::StandardButton confirm;
-    confirm = QMessageBox::question(this, "Delete EXUS Node?", "Are you sure you want to delete this EXUS node configuration?", QMessageBox::Yes|QMessageBox::No);
-
-    if(confirm == QMessageBox::Yes) {
-        QModelIndex index = selected.at(0);
-        int r = index.row();
-        std::string sAddress = ui->tableWidget_2->item(r, 1)->text().toStdString();
-
-
-        ui->tableWidget_2->clearContents();
-        ui->tableWidget_2->setRowCount(0);
-
-        BOOST_FOREACH(CMasternode& mn, vMasternodes) {
-            updateExusNode( QString::fromStdString(mne.getAlias()), QString::fromStdString(mne.getIp()), QString::fromStdString(mne.getPrivKey()), QString::fromStdString(mne.getTxHash()) );
-        }
-    }
-}
-
 void MasternodeManager::updateNodeList() {
     static int64_t nTimeListUpdated = GetTime();
     int64_t nSecondsToWait = nTimeListUpdated - GetTime() + 30;
@@ -207,7 +172,6 @@ void MasternodeManager::updateNodeList() {
     ui->countLabel->setText(QString::number(ui->tableWidgetMasternodes->rowCount()));
     ui->tableWidgetMasternodes->setSortingEnabled(true);
 }
-
 
 void MasternodeManager::setClientModel(ClientModel *model) {
     this->clientModel = model;
