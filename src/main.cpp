@@ -83,21 +83,20 @@ std::set<uint256> setValidatedTx;
  * These functions dispatch to one or all registered wallets
  ********************************/
 namespace {
-
-struct CMainSignals {
-    // Notifies listeners of updated transaction data (passing hash, transaction, and optionally the block it is found in.
-    boost::signals2::signal<void (const CTransaction &, const CBlock *, bool)> SyncTransaction;
-    // Notifies listeners of an erased transaction (currently disabled, requires transaction replacement).
-    boost::signals2::signal<void (const uint256 &)> EraseTransaction;
-    // Notifies listeners of an updated transaction without new data (for now: a coinbase potentially becoming visible).
-    boost::signals2::signal<void (const uint256 &)> UpdatedTransaction;
-    // Notifies listeners of a new active block chain.
-    boost::signals2::signal<void (const CBlockLocator &)> SetBestChain;
-    // Notifies listeners about an inventory item being seen on the network.
-    boost::signals2::signal<void (const uint256 &)> Inventory;
-    // Tells listeners to broadcast their data.
-    boost::signals2::signal<void (bool)> Broadcast;
-} g_signals;
+  struct CMainSignals {
+      // Notifies listeners of updated transaction data (passing hash, transaction, and optionally the block it is found in.
+      boost::signals2::signal<void (const CTransaction &, const CBlock *, bool)> SyncTransaction;
+      // Notifies listeners of an erased transaction (currently disabled, requires transaction replacement).
+      boost::signals2::signal<void (const uint256 &)> EraseTransaction;
+      // Notifies listeners of an updated transaction without new data (for now: a coinbase potentially becoming visible).
+      boost::signals2::signal<void (const uint256 &)> UpdatedTransaction;
+      // Notifies listeners of a new active block chain.
+      boost::signals2::signal<void (const CBlockLocator &)> SetBestChain;
+      // Notifies listeners about an inventory item being seen on the network.
+      boost::signals2::signal<void (const uint256 &)> Inventory;
+      // Tells listeners to broadcast their data.
+      boost::signals2::signal<void (bool)> Broadcast;
+  } g_signals;
 }
 
 void RegisterWallet(CWalletInterface* pwalletIn) {
@@ -184,7 +183,6 @@ namespace {
       LOCK(cs_main);
       mapNodeState.erase(nodeid);
   }
-
 }
 
 bool GetNodeStateStats(NodeId nodeid, CNodeStateStats &stats) {
@@ -229,14 +227,6 @@ bool AddOrphanTx(const CTransaction& tx) {
     uint256 hash = tx.GetHash();
     if (mapOrphanTransactions.count(hash))
         return false;
-
-    // Ignore big transactions, to avoid a
-    // send-big-orphans memory exhaustion attack. If a peer has a legitimate
-    // large transaction with a missing parent then we assume
-    // it will rebroadcast it later, after the parent transaction(s)
-    // have been mined or received.
-    // 10,000 orphans, each of which is at most 5,000 bytes big is
-    // at most 500 megabytes of orphans:
 
     size_t nSize = tx.GetSerializeSize(SER_NETWORK, CTransaction::CURRENT_VERSION);
 
@@ -591,13 +581,11 @@ int64_t GetMasternodePayment(int nHeight, int64_t blockValue) {
  * 2. P2SH scripts with a crazy number of expensive
  * CHECKSIG/CHECKMULTISIG operations
  ********************************/
-bool AreInputsStandard(const CTransaction& tx, const MapPrevTx& mapInputs)
-{
+bool AreInputsStandard(const CTransaction& tx, const MapPrevTx& mapInputs) {
     if (tx.IsCoinBase())
         return true; // Coinbases don't use vin normally
 
-    for (unsigned int i = 0; i < tx.vin.size(); i++)
-    {
+    for (unsigned int i = 0; i < tx.vin.size(); i++) {
         const CTxOut& prev = tx.GetOutputFor(tx.vin[i], mapInputs);
 
         vector<vector<unsigned char> > vSolutions;
@@ -620,15 +608,13 @@ bool AreInputsStandard(const CTransaction& tx, const MapPrevTx& mapInputs)
         if (!EvalScript(stack, tx.vin[i].scriptSig, tx, i, SCRIPT_VERIFY_NONE, 0))
             return false;
 
-        if (whichType == TX_SCRIPTHASH)
-        {
+        if (whichType == TX_SCRIPTHASH) {
             if (stack.empty())
                 return false;
             CScript subscript(stack.back().begin(), stack.back().end());
             vector<vector<unsigned char> > vSolutions2;
             txnouttype whichType2;
-            if (Solver(subscript, whichType2, vSolutions2))
-            {
+            if (Solver(subscript, whichType2, vSolutions2)) {
                 int tmpExpected = ScriptSigArgsExpected(whichType2, vSolutions2);
 
                 if (whichType2 == TX_SCRIPTHASH)
@@ -637,9 +623,7 @@ bool AreInputsStandard(const CTransaction& tx, const MapPrevTx& mapInputs)
                     return false;
 
                 nArgsExpected += tmpExpected;
-            }
-            else
-            {
+            } else {
                 // Any other Script with less than 15 sigops OK:
                 unsigned int sigops = subscript.GetSigOpCount(true);
                 // ... extra data left on the stack after execution is OK, too:
@@ -657,25 +641,21 @@ bool AreInputsStandard(const CTransaction& tx, const MapPrevTx& mapInputs)
 unsigned int GetLegacySigOpCount(const CTransaction& tx)
 {
     unsigned int nSigOps = 0;
-    BOOST_FOREACH(const CTxIn& txin, tx.vin)
-    {
+    BOOST_FOREACH(const CTxIn& txin, tx.vin) {
         nSigOps += txin.scriptSig.GetSigOpCount(false);
     }
-    BOOST_FOREACH(const CTxOut& txout, tx.vout)
-    {
+    BOOST_FOREACH(const CTxOut& txout, tx.vout) {
         nSigOps += txout.scriptPubKey.GetSigOpCount(false);
     }
     return nSigOps;
 }
 
-unsigned int GetP2SHSigOpCount(const CTransaction& tx, const MapPrevTx& inputs)
-{
+unsigned int GetP2SHSigOpCount(const CTransaction& tx, const MapPrevTx& inputs) {
     if (tx.IsCoinBase())
         return 0;
 
     unsigned int nSigOps = 0;
-    for (unsigned int i = 0; i < tx.vin.size(); i++)
-    {
+    for (unsigned int i = 0; i < tx.vin.size(); i++) {
         const CTxOut& prevout = tx.GetOutputFor(tx.vin[i], inputs);
         if (prevout.scriptPubKey.IsPayToScriptHash())
             nSigOps += prevout.scriptPubKey.GetSigOpCount(tx.vin[i].scriptSig);
@@ -683,8 +663,7 @@ unsigned int GetP2SHSigOpCount(const CTransaction& tx, const MapPrevTx& inputs)
     return nSigOps;
 }
 
-int CMerkleTx::SetMerkleBranch(const CBlock* pblock)
-{
+int CMerkleTx::SetMerkleBranch(const CBlock* pblock) {
     AssertLockHeld(cs_main);
     CBlock blockTmp;
 
@@ -707,8 +686,7 @@ int CMerkleTx::SetMerkleBranch(const CBlock* pblock)
         for (nIndex = 0; nIndex < (int)pblock->vtx.size(); nIndex++)
             if (pblock->vtx[nIndex] == *(CTransaction*)this)
                 break;
-        if (nIndex == (int)pblock->vtx.size())
-        {
+        if (nIndex == (int)pblock->vtx.size()) {
             vMerkleBranch.clear();
             nIndex = -1;
             LogPrintf("ERROR: SetMerkleBranch() : couldn't find tx in block\n");
@@ -730,8 +708,7 @@ int CMerkleTx::SetMerkleBranch(const CBlock* pblock)
     return pindexBest->nHeight - pindex->nHeight + 1;
 }
 
-double CTransaction::ComputePriority(double dPriorityInputs, unsigned int nTxSize) const
-{
+double CTransaction::ComputePriority(double dPriorityInputs, unsigned int nTxSize) const {
     // In order to avoid disincentivizing cleaning up the UTXO set we don't count
     // the constant overhead for each txin and up to 110 bytes of scriptSig (which
     // is enough to cover a compressed pubkey p2sh redemption) for priority.
@@ -739,8 +716,7 @@ double CTransaction::ComputePriority(double dPriorityInputs, unsigned int nTxSiz
     // risk encouraging people to create junk outputs to redeem later.
     if (nTxSize == 0)
         nTxSize = ::GetSerializeSize(*this, SER_NETWORK, PROTOCOL_VERSION);
-    BOOST_FOREACH(const CTxIn& txin, vin)
-    {
+    BOOST_FOREACH(const CTxIn& txin, vin) {
         unsigned int offset = 41U + std::min(110U, (unsigned int)txin.scriptSig.size());
         if (nTxSize > offset)
             nTxSize -= offset;
@@ -749,8 +725,7 @@ double CTransaction::ComputePriority(double dPriorityInputs, unsigned int nTxSiz
     return dPriorityInputs / nTxSize;
 }
 
-bool CTransaction::CheckTransaction() const
-{
+bool CTransaction::CheckTransaction() const {
     // Basic checks that don't depend on any context
     if (vin.empty())
         return DoS(10, error("CTransaction::CheckTransaction() : vin empty"));
@@ -762,8 +737,7 @@ bool CTransaction::CheckTransaction() const
 
     // Check for negative or overflow output values
     int64_t nValueOut = 0;
-    for (unsigned int i = 0; i < vout.size(); i++)
-    {
+    for (unsigned int i = 0; i < vout.size(); i++) {
         const CTxOut& txout = vout[i];
         if (txout.IsEmpty() && !IsCoinBase() && !IsCoinStake())
             return DoS(100, error("CTransaction::CheckTransaction() : txout empty for user transaction"));
@@ -778,20 +752,16 @@ bool CTransaction::CheckTransaction() const
 
     // Check for duplicate inputs
     set<COutPoint> vInOutPoints;
-    BOOST_FOREACH(const CTxIn& txin, vin)
-    {
+    BOOST_FOREACH(const CTxIn& txin, vin) {
         if (vInOutPoints.count(txin.prevout))
             return false;
         vInOutPoints.insert(txin.prevout);
     }
 
-    if (IsCoinBase())
-    {
+    if (IsCoinBase()) {
         if (vin[0].scriptSig.size() < 2 || vin[0].scriptSig.size() > 100)
             return DoS(100, error("CTransaction::CheckTransaction() : coinbase script size is invalid"));
-    }
-    else
-    {
+    } else {
         BOOST_FOREACH(const CTxIn& txin, vin)
             if (txin.prevout.IsNull())
                 return DoS(10, error("CTransaction::CheckTransaction() : prevout is null"));
@@ -800,30 +770,13 @@ bool CTransaction::CheckTransaction() const
     return true;
 }
 
-int64_t GetMinFee(const CTransaction& tx, unsigned int nBytes, bool fAllowFree, enum GetMinFee_mode mode)
-{
+int64_t GetMinFee(const CTransaction& tx, unsigned int nBytes, bool fAllowFree, enum GetMinFee_mode mode) {
     // Base fee is either MIN_TX_FEE or MIN_RELAY_TX_FEE
     int64_t nBaseFee = (mode == GMF_RELAY) ? MIN_RELAY_TX_FEE : MIN_TX_FEE;
 
     int64_t nMinFee = (1 + (int64_t)nBytes / 1000) * nBaseFee;
 
-    /*if (fAllowFree)
-    {
-        // There is a free transaction area in blocks created by most miners,
-        // * If we are relaying we allow transactions up to DEFAULT_BLOCK_PRIORITY_SIZE - 1000
-        //   to be considered to fall into this category. We don't want to encourage sending
-        //   multiple transactions instead of one big transaction to avoid fees.
-        // * If we are creating a transaction we allow transactions up to 1,000 bytes
-        //   to be considered safe and assume they can likely make it into this section.
-        if (nBytes < (mode == GMF_SEND ? 1000 : (DEFAULT_BLOCK_PRIORITY_SIZE - 1000)))
-            nMinFee = 0;
-    }*/
-
-    // This code can be removed after enough miners have upgraded to version 0.9.
-    // Until then, be safe when sending and require a fee if any output
-    // is less than CENT:
-    if (nMinFee < nBaseFee && mode == GMF_SEND)
-    {
+    if (nMinFee < nBaseFee && mode == GMF_SEND) {
         BOOST_FOREACH(const CTxOut& txout, tx.vout)
             if (txout.nValue < CENT)
                 nMinFee = nBaseFee;
@@ -836,8 +789,7 @@ int64_t GetMinFee(const CTransaction& tx, unsigned int nBytes, bool fAllowFree, 
 
 
 bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx, bool fLimitFree,
-                        bool* pfMissingInputs, bool fRejectInsaneFee, bool ignoreFees)
-{
+                        bool* pfMissingInputs, bool fRejectInsaneFee, bool ignoreFees) {
     AssertLockHeld(cs_main);
     if (pfMissingInputs)
         *pfMissingInputs = false;
