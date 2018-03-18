@@ -21,3 +21,7 @@ v2.0.0.0
 * Updated last POW block
 * Updated POS reward structure
 * Bug fixes
+
+v2.0.0.1
+--------
+* Fixed the issue when Windows Defender is quarantining .exe file

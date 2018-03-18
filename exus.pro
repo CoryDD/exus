@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = exus-qt
-VERSION = 2.0.0.0
+VERSION = 2.0.0.1
 INCLUDEPATH += src src/json src/qt src/qt/plugins/mrichtexteditor
 INCLUDEPATH += src/secp256k1/include
 QT += network printsupport
