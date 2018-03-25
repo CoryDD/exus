@@ -37,13 +37,15 @@ namespace Checkpoints
     ( 85000, uint256("0xaf43a36df9c5f014a02e66a9f39bcbc025f5669b1b10a39b097683815f8f84c1") )
     ( 90000, uint256("0x5721a1602ab6ceed4004f7ad1c137fa5e3bbde254b90f20d9a87e0f8733fb035") )
 
+    ( 100000, uint256("0x05da8b9bb2ec8100d90ce95475efef658147b9ed81712e611294af49ea16954c") )
+    ( 105000, uint256("0xff1552e0e5551198cc7846059f7e78a323058e97701e03377928b60a49b624d0") )
+
     ;
 
     // TestNet has no checkpoints
     static MapCheckpoints mapCheckpointsTestnet;
 
-    bool CheckHardened(int nHeight, const uint256& hash)
-    {
+    bool CheckHardened(int nHeight, const uint256& hash) {
         MapCheckpoints& checkpoints = (TestNet() ? mapCheckpointsTestnet : mapCheckpoints);
 
         MapCheckpoints::const_iterator i = checkpoints.find(nHeight);
@@ -51,8 +53,7 @@ namespace Checkpoints
         return hash == i->second;
     }
 
-    int GetTotalBlocksEstimate()
-    {
+    int GetTotalBlocksEstimate() {
         MapCheckpoints& checkpoints = (TestNet() ? mapCheckpointsTestnet : mapCheckpoints);
 
         if (checkpoints.empty())
@@ -60,8 +61,7 @@ namespace Checkpoints
         return checkpoints.rbegin()->first;
     }
 
-    CBlockIndex* GetLastCheckpoint(const std::map<uint256, CBlockIndex*>& mapBlockIndex)
-    {
+    CBlockIndex* GetLastCheckpoint(const std::map<uint256, CBlockIndex*>& mapBlockIndex) {
         MapCheckpoints& checkpoints = (TestNet() ? mapCheckpointsTestnet : mapCheckpoints);
 
         BOOST_REVERSE_FOREACH(const MapCheckpoints::value_type& i, checkpoints)
@@ -75,8 +75,7 @@ namespace Checkpoints
     }
 
     // Automatically select a suitable sync-checkpoint
-    const CBlockIndex* AutoSelectSyncCheckpoint()
-    {
+    const CBlockIndex* AutoSelectSyncCheckpoint() {
         const CBlockIndex *pindex = pindexBest;
         // Search backward for a block within max span and maturity window
         while (pindex->pprev && pindex->nHeight + nCheckpointSpan > pindexBest->nHeight)
@@ -85,8 +84,7 @@ namespace Checkpoints
     }
 
     // Check against synchronized checkpoint
-    bool CheckSync(int nHeight)
-    {
+    bool CheckSync(int nHeight) {
         const CBlockIndex* pindexSync = AutoSelectSyncCheckpoint();
         if (nHeight <= pindexSync->nHeight){
             return false;

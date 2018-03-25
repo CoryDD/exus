@@ -312,23 +312,6 @@ bool IsStandardTx(const CTransaction& tx, string& reason) {
         return false;
     }
 
-    // Treat non-final transactions as non-standard to prevent a specific type
-    // of double-spend attack, as well as DoS attacks. (if the transaction
-    // can't be mined, the attacker isn't expending resources broadcasting it)
-    // Basically we don't want to propagate transactions that can't be included in
-    // the next block.
-    //
-    // However, IsFinalTx() is confusing... Without arguments, it uses
-    // chainActive.Height() to evaluate nLockTime; when a block is accepted, chainActive.Height()
-    // is set to the value of nHeight in the block. However, when IsFinalTx()
-    // is called within CBlock::AcceptBlock(), the height of the block *being*
-    // evaluated is what is used. Thus if we want to know if a transaction can
-    // be part of the *next* block, we need to call IsFinalTx() with one more
-    // than chainActive.Height().
-    //
-    // Timestamps on the other hand don't get any special treatment, because we
-    // can't know what timestamp the next block will have, and there aren't
-    // timestamp applications where it matters.
     if (!IsFinalTx(tx, nBestHeight + 1)) {
         reason = "non-final";
         return false;
@@ -431,7 +414,7 @@ int64_t GetProofOfWorkReward(int nHeight, int64_t nFees) {
  	int64_t nSubsidy = 1 * COIN;
 
  	if (nHeight == 1) {
- 		nSubsidy = 400000 * COIN;      // premined 1.93% of POW
+ 		nSubsidy = 400000 * COIN;      // premined 0.95%
  	}
  	else if (nHeight >= 2 && nHeight < 1441) {
  	  nSubsidy = 1 * COIN;           // to prevent instamine for 24 hours
@@ -638,8 +621,7 @@ bool AreInputsStandard(const CTransaction& tx, const MapPrevTx& mapInputs) {
     return true;
 }
 
-unsigned int GetLegacySigOpCount(const CTransaction& tx)
-{
+unsigned int GetLegacySigOpCount(const CTransaction& tx) {
     unsigned int nSigOps = 0;
     BOOST_FOREACH(const CTxIn& txin, tx.vin) {
         nSigOps += txin.scriptSig.GetSigOpCount(false);
@@ -963,8 +945,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx, bool fLimitFree,
 }
 
 bool AcceptableInputs(CTxMemPool& pool, const CTransaction &txo, bool fLimitFree,
-                         bool* pfMissingInputs, bool fRejectInsaneFee, bool isDSTX)
-{
+                         bool* pfMissingInputs, bool fRejectInsaneFee, bool isDSTX) {
     AssertLockHeld(cs_main);
     if (pfMissingInputs)
         *pfMissingInputs = false;
@@ -1096,7 +1077,6 @@ bool AcceptableInputs(CTxMemPool& pool, const CTransaction &txo, bool fLimitFree
         }
     }
 
-
     /*LogPrint("mempool", "AcceptableInputs : accepted %s (poolsz %u)\n",
            hash.ToString(),
            pool.mapTx.size());
@@ -1105,8 +1085,7 @@ bool AcceptableInputs(CTxMemPool& pool, const CTransaction &txo, bool fLimitFree
 }
 
 
-int CMerkleTx::GetDepthInMainChainINTERNAL(CBlockIndex* &pindexRet) const
-{
+int CMerkleTx::GetDepthInMainChainINTERNAL(CBlockIndex* &pindexRet) const {
     if (hashBlock == 0 || nIndex == -1)
         return 0;
     AssertLockHeld(cs_main);
@@ -1131,8 +1110,7 @@ int CMerkleTx::GetDepthInMainChainINTERNAL(CBlockIndex* &pindexRet) const
     return pindexBest->nHeight - pindex->nHeight + 1;
 }
 
-int CMerkleTx::GetTransactionLockSignatures() const
-{
+int CMerkleTx::GetTransactionLockSignatures() const {
     if(!IsSporkActive(SPORK_2_INSTANTX)) return -3;
     if(!fEnableInstantX) return -1;
 
@@ -1145,8 +1123,7 @@ int CMerkleTx::GetTransactionLockSignatures() const
     return -1;
 }
 
-bool CMerkleTx::IsTransactionLockTimedOut() const
-{
+bool CMerkleTx::IsTransactionLockTimedOut() const {
     if(!fEnableInstantX) return -1;
 
     //compile consessus vote
@@ -1158,8 +1135,7 @@ bool CMerkleTx::IsTransactionLockTimedOut() const
     return false;
 }
 
-int CMerkleTx::GetDepthInMainChain(CBlockIndex* &pindexRet, bool enableIX) const
-{
+int CMerkleTx::GetDepthInMainChain(CBlockIndex* &pindexRet, bool enableIX) const {
     AssertLockHeld(cs_main);
     int nResult = GetDepthInMainChainINTERNAL(pindexRet);
     if (nResult == 0 && !mempool.exists(GetHash()))
@@ -1177,23 +1153,18 @@ int CMerkleTx::GetDepthInMainChain(CBlockIndex* &pindexRet, bool enableIX) const
     return nResult;
 }
 
-int CMerkleTx::GetBlocksToMaturity() const
-{
+int CMerkleTx::GetBlocksToMaturity() const {
     if (!(IsCoinBase() || IsCoinStake()))
         return 0;
     return max(0, nCoinbaseMaturity - GetDepthInMainChain() + 1);
 }
 
 
-bool CMerkleTx::AcceptToMemoryPool(bool fLimitFree, bool fRejectInsaneFee, bool ignoreFees)
-{
+bool CMerkleTx::AcceptToMemoryPool(bool fLimitFree, bool fRejectInsaneFee, bool ignoreFees) {
     return ::AcceptToMemoryPool(mempool, *this, fLimitFree, NULL, fRejectInsaneFee, ignoreFees);
 }
 
-
-
-bool CWalletTx::AcceptWalletTransaction(CTxDB& txdb)
-{
+bool CWalletTx::AcceptWalletTransaction(CTxDB& txdb) {
 
     {
         // Add previous supporting transactions first
@@ -1211,34 +1182,31 @@ bool CWalletTx::AcceptWalletTransaction(CTxDB& txdb)
     return false;
 }
 
-bool CWalletTx::AcceptWalletTransaction()
-{
+bool CWalletTx::AcceptWalletTransaction() {
     CTxDB txdb("r");
     return AcceptWalletTransaction(txdb);
 }
 
-int GetInputAge(CTxIn& vin)
-{
+int GetInputAge(CTxIn& vin) {
     const uint256& prevHash = vin.prevout.hash;
     CTransaction tx;
     uint256 hashBlock;
     bool fFound = GetTransaction(prevHash, tx, hashBlock);
-    if(fFound)
-    {
-    if(mapBlockIndex.find(hashBlock) != mapBlockIndex.end())
-    {
+    if(fFound) {
+      if(mapBlockIndex.find(hashBlock) != mapBlockIndex.end()) {
         return pindexBest->nHeight - mapBlockIndex[hashBlock]->nHeight;
+      }
+      else {
+        return 0;
+      }
     }
-    else
+    else {
         return 0;
     }
-    else
-        return 0;
 }
 
 
-int GetInputAgeIX(uint256 nTXHash, CTxIn& vin)
-{
+int GetInputAgeIX(uint256 nTXHash, CTxIn& vin) {
     int sigs = 0;
     int nResult = GetInputAge(vin);
     if(nResult < 0) nResult = 0;
@@ -1252,12 +1220,10 @@ int GetInputAgeIX(uint256 nTXHash, CTxIn& vin)
             return nInstantXDepth+nResult;
         }
     }
-
     return -1;
 }
 
-int GetIXConfirmations(uint256 nTXHash)
-{
+int GetIXConfirmations(uint256 nTXHash) {
     int sigs = 0;
 
     std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(nTXHash);
@@ -1271,8 +1237,7 @@ int GetIXConfirmations(uint256 nTXHash)
     return 0;
 }
 
-int CTxIndex::GetDepthInMainChain() const
-{
+int CTxIndex::GetDepthInMainChain() const {
     // Read block header
     CBlock block;
     if (!block.ReadFromDisk(pos.nFile, pos.nBlockPos, false))
@@ -1288,8 +1253,7 @@ int CTxIndex::GetDepthInMainChain() const
 }
 
 // Return transaction in tx, and if it was found inside a block, its hash is placed in hashBlock
-bool GetTransaction(const uint256 &hash, CTransaction &tx, uint256 &hashBlock)
-{
+bool GetTransaction(const uint256 &hash, CTransaction &tx, uint256 &hashBlock) {
     {
         LOCK(cs_main);
         {
@@ -1333,8 +1297,7 @@ bool GetTransaction(const uint256 &hash, CTransaction &tx, uint256 &hashBlock)
  * CBlock and CBlockIndex
  ********************************/
 static CBlockIndex* pblockindexFBBHLast;
-CBlockIndex* FindBlockByHeight(int nHeight)
-{
+CBlockIndex* FindBlockByHeight(int nHeight) {
     CBlockIndex *pblockindex;
     if (nHeight < nBestHeight / 2)
         pblockindex = pindexGenesisBlock;
@@ -1350,8 +1313,7 @@ CBlockIndex* FindBlockByHeight(int nHeight)
     return pblockindex;
 }
 
-bool CBlock::ReadFromDisk(const CBlockIndex* pindex, bool fReadTransactions)
-{
+bool CBlock::ReadFromDisk(const CBlockIndex* pindex, bool fReadTransactions) {
     if (!fReadTransactions)
     {
         *this = pindex->GetBlockHeader();

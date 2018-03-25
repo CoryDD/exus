@@ -27,8 +27,7 @@ struct SeedSpec6 {
 //
 
 // Convert the pnSeeds array into usable address objects.
-static void convertSeeds(std::vector<CAddress> &vSeedsOut, const unsigned int *data, unsigned int count, int port)
-{
+static void convertSeeds(std::vector<CAddress> &vSeedsOut, const unsigned int *data, unsigned int count, int port) {
      // It'll only connect to one or two seed nodes because once it connects,
      // it'll get a pile of addresses with newer timestamps.
      // Seed nodes are given a random 'last seen time' of between one and two
@@ -53,33 +52,12 @@ static void convertSeeds(std::vector<CAddress> &vSeedsOut, const unsigned int *d
     }
 }
 
-// Convert the pnSeeds6 array into usable address objects.
-static void convertSeed6(std::vector<CAddress> &vSeedsOut, const SeedSpec6 *data, unsigned int count)
-{
-    // It'll only connect to one or two seed nodes because once it connects,
-    // it'll get a pile of addresses with newer timestamps.
-    // Seed nodes are given a random 'last seen time' of between one and two
-    // weeks ago.
-    const int64_t nOneWeek = 7*24*60*60;
-    for (unsigned int i = 0; i < count; i++)
-    {
-        struct in6_addr ip;
-        memcpy(&ip, data[i].addr, sizeof(ip));
-        CAddress addr(CService(ip, data[i].port));
-        addr.nTime = GetTime() - GetRand(nOneWeek) - nOneWeek;
-        vSeedsOut.push_back(addr);
-    }
-}
-
 /*******************/
 /* Main network    */
 /*******************/
 class CMainParams : public CChainParams {
 public:
     CMainParams() {
-        // The message start string is designed to be unlikely to occur in normal data.
-        // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
-        // a large 4-byte int at any alignment.
         pchMessageStart[0] = 0xec;
         pchMessageStart[1] = 0x3a;
         pchMessageStart[2] = 0xaf;
@@ -90,13 +68,6 @@ public:
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 20);
 
         /** Genesis block info:
-        CBlock(hash=0000088e39f7f205701afd80597d455da6c775463bf8d72d6a45bab2160ea929, ver=1, hashPrevBlock=0000000000000000000000000000000000000000000000000000000000000000, hashMerkleRoot=aa9413a7d0545af6b3d5ced324ff0529c30c656cd7fb7192db0818781fbfb440, nTime=1518161400, nBits=1e0fffff, nNonce=2938116, vtx=1, vchBlockSig=)
-          Coinbase(hash=aa9413a7d0545af6b3d5ced324ff0529c30c656cd7fb7192db0818781fbfb440, nTime=1518161400, ver=1, vin.size=1, vout.size=1, nLockTime=0)
-            CTxIn(COutPoint(0000000000, 4294967295), coinbase 00012a4032303138204665627275617279203820537061636558204c61756e636865642074686520576f726c642073204d6f737420506f77657266756c20526f636b6574)
-            CTxOut(empty)
-
-          vMerkleTree:  aa9413a7d0545af6b3d5ced324ff0529c30c656cd7fb7192db0818781fbfb440
-
         mainnet.genesis.GetHash():      0000088e39f7f205701afd80597d455da6c775463bf8d72d6a45bab2160ea929
         mainnet.genesis.hashMerkleRoot: aa9413a7d0545af6b3d5ced324ff0529c30c656cd7fb7192db0818781fbfb440
         mainnet.genesis.nTime:          1518161400
@@ -172,18 +143,7 @@ public:
         nRPCPort = 14877;
         strDataDir = "testnet";
 
-        /**
-        CBlock(hash=00000facbb1d343df60c249084393ad2039b717fc455f9dc58dd1c2ff2a67654, ver=1, hashPrevBlock=0000000000000000000000000000000000000000000000000000000000000000, hashMerkleRoot=84cd53c84f276442d1fb98eb847216d1c88013af9e3b82b7567090aaac3c6aab, nTime=1518161400, nBits=1e0fffff, nNonce=277487, vtx=2, vchBlockSig=)
-          Coinbase(hash=aa9413a7d0545af6b3d5ced324ff0529c30c656cd7fb7192db0818781fbfb440, nTime=1518161400, ver=1, vin.size=1, vout.size=1, nLockTime=0)
-            CTxIn(COutPoint(0000000000, 4294967295), coinbase 00012a4032303138204665627275617279203820537061636558204c61756e636865642074686520576f726c642073204d6f737420506f77657266756c20526f636b6574)
-            CTxOut(empty)
-
-          Coinbase(hash=d524a6425f55721eff9fd2000a412b1a1c95cead2d20c4de3a04e0b0174cd1d6, nTime=1518161400, ver=1, vin.size=1, vout.size=1, nLockTime=0)
-            CTxIn(COutPoint(0000000000, 4294967295), coinbase 00012a1e32303138204558555320636f696e2074657374206e65742062697274682e)
-            CTxOut(empty)
-
-          vMerkleTree:  aa9413a7d0545af6b3d5ced324ff0529c30c656cd7fb7192db0818781fbfb440 d524a6425f55721eff9fd2000a412b1a1c95cead2d20c4de3a04e0b0174cd1d6 84cd53c84f276442d1fb98eb847216d1c88013af9e3b82b7567090aaac3c6aab
-
+        /** Testnet genesis block info
         testnet.genesis.GetHash():      00000facbb1d343df60c249084393ad2039b717fc455f9dc58dd1c2ff2a67654
         testnet.genesis.hashMerkleRoot: 84cd53c84f276442d1fb98eb847216d1c88013af9e3b82b7567090aaac3c6aab
         testnet.genesis.nTime:          1518161400
@@ -227,8 +187,6 @@ public:
     virtual Network NetworkID() const { return CChainParams::TESTNET; }
 };
 static CTestNetParams testNetParams;
-
-
 static CChainParams *pCurrentParams = &mainParams;
 
 const CChainParams &Params() {
