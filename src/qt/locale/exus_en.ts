@@ -1402,8 +1402,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="-32"/>
-        <source>Total of coins that was staked, and do not yet count toward the current balance</source>
-        <translation>Total of coins that was staked, and do not yet count toward the current balance</translation>
+        <source>Total number of coins that were staked. These do not yet count towards the total balance.</source>
+        <translation>Total number of coins that were staked. These do not yet count towards the total balance.</translation>
     </message>
     <message>
         <location filename="../overviewpage.cpp" line="+116"/>
