@@ -4,20 +4,20 @@ Copyright (c) 2018 Exus developers
 Distributed under the MIT/X11 software license, see the accompanying
 file COPYING or http://www.opensource.org/licenses/mit-license.php.
 */
+#include "checkpoints.h"
+#include "main.h"
+#include "txdb.h"
+#include "uint256.h"
 #include <boost/assign/list_of.hpp> // for 'map_list_of()'
 #include <boost/foreach.hpp>
-#include "checkpoints.h"
-#include "txdb.h"
-#include "main.h"
-#include "uint256.h"
 
 static const int nCheckpointSpan = 5000;
 
 namespace Checkpoints
 {
-    typedef std::map<int, uint256> MapCheckpoints;
+typedef std::map<int, uint256> MapCheckpoints;
 
-    static MapCheckpoints mapCheckpoints =
+static MapCheckpoints mapCheckpoints =
         boost::assign::map_list_of
     (     0, uint256("0x0000088e39f7f205701afd80597d455da6c775463bf8d72d6a45bab2160ea929") )
     (  5000, uint256("0x2205d4b5d9536117b564682e6c93783c8d69296de7ce6b0b13278994e431263a") )
@@ -42,55 +42,63 @@ namespace Checkpoints
     ( 115000, uint256("0x84f0bae54b5e75b70f78def3296e37770515d0d8cf26fc1582eb3c26032ac387") )
     ( 120000, uint256("0xec2789b748f37b03df8d69a14e6d47f91480a7e62b0e9b549cfa9d838c032d87") ) // End POW
     ( 125000, uint256("0xf815b128af4bc5d3a89e2cd9c9527c068a74d78a1d44b0e3e8e963602729dd3d") )
+    ( 130000, uint256("0x57b7174ce28f84e015d8766d8f7bdc20d34e418c6f0f5c0218edb85b580a442d") )
+    ( 135000, uint256("0x3f4858b18760f302ea8f65542b25fefcdb392192884def39472cb61a4a30bf34") )
+    ( 140000, uint256("0x91ce9333ef62bc3ff59d581aeb68f3d0fa5787368529c61fcef02fcaabb539ca") )
     ;
 
-    // TestNet has no checkpoints
-    static MapCheckpoints mapCheckpointsTestnet;
 
-    bool CheckHardened(int nHeight, const uint256& hash) {
-        MapCheckpoints& checkpoints = (TestNet() ? mapCheckpointsTestnet : mapCheckpoints);
+// TestNet has no checkpoints
+static MapCheckpoints mapCheckpointsTestnet;
 
-        MapCheckpoints::const_iterator i = checkpoints.find(nHeight);
-        if (i == checkpoints.end()) return true;
-        return hash == i->second;
-    }
+bool CheckHardened(int nHeight, const uint256& hash)
+{
+    MapCheckpoints& checkpoints = (TestNet() ? mapCheckpointsTestnet : mapCheckpoints);
 
-    int GetTotalBlocksEstimate() {
-        MapCheckpoints& checkpoints = (TestNet() ? mapCheckpointsTestnet : mapCheckpoints);
-
-        if (checkpoints.empty())
-            return 0;
-        return checkpoints.rbegin()->first;
-    }
-
-    CBlockIndex* GetLastCheckpoint(const std::map<uint256, CBlockIndex*>& mapBlockIndex) {
-        MapCheckpoints& checkpoints = (TestNet() ? mapCheckpointsTestnet : mapCheckpoints);
-
-        BOOST_REVERSE_FOREACH(const MapCheckpoints::value_type& i, checkpoints)
-        {
-            const uint256& hash = i.second;
-            std::map<uint256, CBlockIndex*>::const_iterator t = mapBlockIndex.find(hash);
-            if (t != mapBlockIndex.end())
-                return t->second;
-        }
-        return NULL;
-    }
-
-    // Automatically select a suitable sync-checkpoint
-    const CBlockIndex* AutoSelectSyncCheckpoint() {
-        const CBlockIndex *pindex = pindexBest;
-        // Search backward for a block within max span and maturity window
-        while (pindex->pprev && pindex->nHeight + nCheckpointSpan > pindexBest->nHeight)
-            pindex = pindex->pprev;
-        return pindex;
-    }
-
-    // Check against synchronized checkpoint
-    bool CheckSync(int nHeight) {
-        const CBlockIndex* pindexSync = AutoSelectSyncCheckpoint();
-        if (nHeight <= pindexSync->nHeight){
-            return false;
-        }
-        return true;
-    }
+    MapCheckpoints::const_iterator i = checkpoints.find(nHeight);
+    if (i == checkpoints.end()) return true;
+    return hash == i->second;
 }
+
+int GetTotalBlocksEstimate()
+{
+    MapCheckpoints& checkpoints = (TestNet() ? mapCheckpointsTestnet : mapCheckpoints);
+
+    if (checkpoints.empty())
+        return 0;
+    return checkpoints.rbegin()->first;
+}
+
+CBlockIndex* GetLastCheckpoint(const std::map<uint256, CBlockIndex*>& mapBlockIndex)
+{
+    MapCheckpoints& checkpoints = (TestNet() ? mapCheckpointsTestnet : mapCheckpoints);
+
+    BOOST_REVERSE_FOREACH (const MapCheckpoints::value_type& i, checkpoints) {
+        const uint256& hash = i.second;
+        std::map<uint256, CBlockIndex*>::const_iterator t = mapBlockIndex.find(hash);
+        if (t != mapBlockIndex.end())
+            return t->second;
+    }
+    return NULL;
+}
+
+// Automatically select a suitable sync-checkpoint
+const CBlockIndex* AutoSelectSyncCheckpoint()
+{
+    const CBlockIndex* pindex = pindexBest;
+    // Search backward for a block within max span and maturity window
+    while (pindex->pprev && pindex->nHeight + nCheckpointSpan > pindexBest->nHeight)
+        pindex = pindex->pprev;
+    return pindex;
+}
+
+// Check against synchronized checkpoint
+bool CheckSync(int nHeight)
+{
+    const CBlockIndex* pindexSync = AutoSelectSyncCheckpoint();
+    if (nHeight <= pindexSync->nHeight) {
+        return false;
+    }
+    return true;
+}
+} // namespace Checkpoints

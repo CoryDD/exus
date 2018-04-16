@@ -9,4 +9,5 @@ qrc_bitcoin.cpp
 config.log
 config.status
 src/secp256k1/Makefile
+src/.clang-format
 

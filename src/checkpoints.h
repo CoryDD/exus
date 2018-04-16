@@ -5,11 +5,11 @@ Distributed under the MIT/X11 software license, see the accompanying
 file COPYING or http://www.opensource.org/licenses/mit-license.php.
 */
 #ifndef BITCOIN_CHECKPOINT_H
-#define  BITCOIN_CHECKPOINT_H
+#define BITCOIN_CHECKPOINT_H
 
-#include <map>
 #include "net.h"
 #include "util.h"
+#include <map>
 
 class uint256;
 class CBlockIndex;
@@ -19,18 +19,17 @@ class CBlockIndex;
  */
 namespace Checkpoints
 {
+// Returns true if block passes checkpoint checks
+bool CheckHardened(int nHeight, const uint256& hash);
 
-    // Returns true if block passes checkpoint checks
-    bool CheckHardened(int nHeight, const uint256& hash);
+// Return conservative estimate of total number of blocks, 0 if unknown
+int GetTotalBlocksEstimate();
 
-    // Return conservative estimate of total number of blocks, 0 if unknown
-    int GetTotalBlocksEstimate();
+// Returns last CBlockIndex* in mapBlockIndex that is a checkpoint
+CBlockIndex* GetLastCheckpoint(const std::map<uint256, CBlockIndex*>& mapBlockIndex);
 
-    // Returns last CBlockIndex* in mapBlockIndex that is a checkpoint
-    CBlockIndex* GetLastCheckpoint(const std::map<uint256, CBlockIndex*>& mapBlockIndex);
-
-    const CBlockIndex* AutoSelectSyncCheckpoint();
-    bool CheckSync(int nHeight);
-}
+const CBlockIndex* AutoSelectSyncCheckpoint();
+bool CheckSync(int nHeight);
+} // namespace Checkpoints
 
 #endif
