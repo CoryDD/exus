@@ -7,15 +7,15 @@ file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef INSTANTX_H
 #define INSTANTX_H
 
-#include "uint256.h"
-#include "sync.h"
-#include "net.h"
-#include "key.h"
-#include "core.h"
-#include "util.h"
-#include "script.h"
 #include "base58.h"
+#include "core.h"
+#include "key.h"
 #include "main.h"
+#include "net.h"
+#include "script.h"
+#include "sync.h"
+#include "uint256.h"
+#include "util.h"
 
 using namespace std;
 using namespace boost;

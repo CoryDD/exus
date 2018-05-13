@@ -8,9 +8,9 @@ file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef DARKSEND_RELAY_H
 #define DARKSEND_RELAY_H
 
+#include "activemasternode.h"
 #include "core.h"
 #include "main.h"
-#include "activemasternode.h"
 #include "masternodeman.h"
 
 

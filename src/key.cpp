@@ -8,9 +8,9 @@
 #include "crypto/hmac_sha512.h"
 #include "pubkey.h"
 
+#include "util.h"
 #include <secp256k1.h>
 #include <secp256k1_recovery.h>
-#include "util.h"
 
 // anonymous namespace
 namespace {

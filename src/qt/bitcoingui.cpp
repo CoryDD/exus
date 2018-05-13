@@ -7,67 +7,66 @@
  * Exus Developers 2018
  */
 
-#include <QApplication>
-#include "bitcoingui.h"
-#include "transactiontablemodel.h"
-#include "addressbookpage.h"
-#include "sendcoinsdialog.h"
-#include "signverifymessagedialog.h"
-#include "optionsdialog.h"
 #include "aboutdialog.h"
-#include "clientmodel.h"
-#include "walletmodel.h"
-#include "editaddressdialog.h"
-#include "optionsmodel.h"
-#include "transactiondescdialog.h"
+#include "addressbookpage.h"
 #include "addresstablemodel.h"
-#include "transactionview.h"
-#include "overviewpage.h"
-#include "bitcoinunits.h"
-#include "guiconstants.h"
 #include "askpassphrasedialog.h"
-#include "notificator.h"
+#include "bitcoingui.h"
+#include "bitcoinunits.h"
+#include "blockbrowser.h"
+#include "clientmodel.h"
+#include "editaddressdialog.h"
+#include "guiconstants.h"
 #include "guiutil.h"
-#include "rpcconsole.h"
-#include "wallet.h"
-#include "main.h"
 #include "init.h"
-#include "ui_interface.h"
+#include "main.h"
 #include "masternodemanager.h"
 #include "messagemodel.h"
 #include "messagepage.h"
-#include "blockbrowser.h"
+#include "notificator.h"
+#include "optionsdialog.h"
+#include "optionsmodel.h"
+#include "overviewpage.h"
+#include "rpcconsole.h"
+#include "sendcoinsdialog.h"
+#include "signverifymessagedialog.h"
 #include "tradingdialog.h"
+#include "transactiondescdialog.h"
+#include "transactiontablemodel.h"
+#include "transactionview.h"
+#include "ui_interface.h"
+#include "wallet.h"
+#include "walletmodel.h"
+#include <QApplication>
 
 #ifdef Q_OS_MAC
 #include "macdockiconhandler.h"
 #endif
 
-#include <QMenuBar>
-#include <QMenu>
+#include <QDateTime>
+#include <QDesktopServices>
+#include <QDragEnterEvent>
+#include <QFileDialog>
 #include <QIcon>
-#include <QVBoxLayout>
-#include <QToolBar>
-#include <QStatusBar>
 #include <QLabel>
+#include <QMenu>
+#include <QMenuBar>
 #include <QMessageBox>
 #include <QMimeData>
+#include <QMovie>
 #include <QProgressBar>
 #include <QProgressDialog>
-#include <QStackedWidget>
-#include <QDateTime>
-#include <QMovie>
-#include <QFileDialog>
-#include <QDesktopServices>
-#include <QTimer>
-#include <QDragEnterEvent>
-#include <QUrl>
-#include <QMimeData>
-#include <QStyle>
-#include <QToolButton>
 #include <QScrollArea>
 #include <QScroller>
+#include <QStackedWidget>
+#include <QStatusBar>
+#include <QStyle>
 #include <QTextDocument>
+#include <QTimer>
+#include <QToolBar>
+#include <QToolButton>
+#include <QUrl>
+#include <QVBoxLayout>
 #include <iostream>
 
 extern bool fOnlyTor;
@@ -485,7 +484,7 @@ void BitcoinGUI::createToolBars()
 
     QWidget *spacer = makeToolBarSpacer();
     netLabel->setObjectName("netLabel");
-    netLabel->setStyleSheet("#netLabel { color: #efefef; }");
+    netLabel->setStyleSheet("#netLabel { color: #3b3b3b; }");
     toolbar->addWidget(spacer);
     toolbar->setOrientation(Qt::Vertical);
     toolbar->setMovable(false);
