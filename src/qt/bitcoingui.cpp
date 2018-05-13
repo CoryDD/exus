@@ -479,12 +479,11 @@ void BitcoinGUI::createToolBars()
     }
 
     toolbar->addAction(blockAction);
-    //toolbar->addAction(TradingAction);
     netLabel = new QLabel();
 
     QWidget *spacer = makeToolBarSpacer();
     netLabel->setObjectName("netLabel");
-    netLabel->setStyleSheet("#netLabel { color: #3b3b3b; }");
+    netLabel->setStyleSheet("#netLabel { color: #efefef; }");
     toolbar->addWidget(spacer);
     toolbar->setOrientation(Qt::Vertical);
     toolbar->setMovable(false);
@@ -991,11 +990,6 @@ void BitcoinGUI::gotoAddressBookPage()
 void BitcoinGUI::gotoTradingPage()
 {
 
-     //TradingAction->setChecked(true);
-     //centralStackedWidget->setCurrentWidget(tradingDialogPage);
-
-  //  exportAction->setEnabled(false);
-  //  disconnect(exportAction, SIGNAL(triggered()), 0, 0);
 }
 
 void BitcoinGUI::gotoReceiveCoinsPage()
