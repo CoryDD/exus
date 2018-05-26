@@ -73,13 +73,13 @@ class CStealthKeyMetadata
 // -- used to get secret for keys created by stealth transaction with wallet locked
 public:
     CStealthKeyMetadata() {};
-    
+
     CStealthKeyMetadata(CPubKey pkEphem_, CPubKey pkScan_)
     {
         pkEphem = pkEphem_;
         pkScan = pkScan_;
     };
-    
+
     CPubKey pkEphem;
     CPubKey pkScan;
 
@@ -111,7 +111,7 @@ public:
 
     bool WriteStealthKeyMeta(const CKeyID& keyId, const CStealthKeyMetadata& sxKeyMeta);
     bool EraseStealthKeyMeta(const CKeyID& keyId);
-    bool WriteStealthAddress(const CStealthAddress& sxAddr);    
+    bool WriteStealthAddress(const CStealthAddress& sxAddr);
     bool ReadStealthAddress(CStealthAddress& sxAddr);
 
     bool WriteKey(const CPubKey& vchPubKey, const CPrivKey& vchPrivKey, const CKeyMetadata &keyMeta);

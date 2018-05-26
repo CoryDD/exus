@@ -5,14 +5,14 @@
 #include "alert.h"
 
 #include "chainparams.h"
-#include "pubkey.h"
 #include "net.h"
+#include "pubkey.h"
 #include "ui_interface.h"
 #include "util.h"
 
-#include <stdint.h>
 #include <algorithm>
 #include <map>
+#include <stdint.h>
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/replace.hpp>
@@ -172,13 +172,6 @@ bool CAlert::ProcessAlert(bool fThread)
     if (!IsInEffect())
         return false;
 
-    // alert.nID=max is reserved for if the alert key is
-    // compromised. It must have a pre-defined message,
-    // must never expire, must apply to all versions,
-    // and must cancel all previous
-    // alerts or it will be ignored (so an attacker can't
-    // send an "everything is OK, don't panic" version that
-    // cannot be overridden):
     int maxInt = std::numeric_limits<int>::max();
     if (nID == maxInt)
     {

@@ -6,22 +6,22 @@
 #include "wallet.h"
 
 #include "base58.h"
+#include "chainparams.h"
 #include "coincontrol.h"
-#include "kernel.h"
-#include "net.h"
-#include "util.h"
-#include "txdb.h"
-#include "ui_interface.h"
-#include "walletdb.h"
 #include "crypter.h"
-#include "key.h"
-#include "spork.h"
 #include "darksend.h"
 #include "instantx.h"
-#include "masternodeman.h"
+#include "kernel.h"
+#include "key.h"
 #include "masternode-payments.h"
-#include "chainparams.h"
+#include "masternodeman.h"
+#include "net.h"
 #include "smessage.h"
+#include "spork.h"
+#include "txdb.h"
+#include "ui_interface.h"
+#include "util.h"
+#include "walletdb.h"
 
 #include <boost/algorithm/string/replace.hpp>
 
@@ -2435,6 +2435,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64_t> >& vecSend, 
                 BOOST_FOREACH(PAIRTYPE(const CWalletTx*, unsigned int) pcoin, setCoins)
                 {
                     int64_t nCredit = pcoin.first->vout[pcoin.second].nValue;
+                    LogPrintf("1. nCredit: %i\n", nCredit);
                     //The coin age after the next block (depth+1) is used instead of the current,
                     //reflecting an assumption the user would accept a bit more delay for
                     //a chance at a free transaction.
@@ -3371,6 +3372,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         return false;
 
     int64_t nCredit = 0;
+    LogPrintf("2. nCredit: %i\n", nCredit);
     CScript scriptPubKeyKernel;
     CTxDB txdb("r");
     BOOST_FOREACH(PAIRTYPE(const CWalletTx*, unsigned int) pcoin, setCoins)
@@ -3434,6 +3436,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                 txNew.nTime -= n;
                 txNew.vin.push_back(CTxIn(pcoin.first->GetHash(), pcoin.second));
                 nCredit += pcoin.first->vout[pcoin.second].nValue;
+                LogPrintf("3. nCredit: %i\n", nCredit);
                 vwtxPrev.push_back(pcoin.first);
                 txNew.vout.push_back(CTxOut(0, scriptPubKeyOut));
 
@@ -3479,6 +3482,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
 
             txNew.vin.push_back(CTxIn(pcoin.first->GetHash(), pcoin.second));
             nCredit += pcoin.first->vout[pcoin.second].nValue;
+            LogPrintf("4. nCredit: %i\n", nCredit);
             vwtxPrev.push_back(pcoin.first);
         }
     }
@@ -3496,6 +3500,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
             return false;
 
         nCredit += nReward;
+        LogPrintf("5. nCredit: %i\n", nCredit);
     }
 
     // Masternode Payments
@@ -3568,23 +3573,26 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
 
         txNew.vout[payments-2].scriptPubKey = payee;
         txNew.vout[payments-2].nValue = 0;
-        
+
         txNew.vout[payments-1].scriptPubKey = payeerewardaddress;
-        txNew.vout[payments-1].nValue = 0;        
+        txNew.vout[payments-1].nValue = 0;
 
         CTxDestination address1;
         ExtractDestination(payee, address1);
         CExuscoinAddress address2(address1);
-        
+
         CTxDestination address3;
         ExtractDestination(payeerewardaddress, address3);
         CExuscoinAddress address4(address3);
 
         LogPrintf("Masternode payment to %s\n", address2.ToString().c_str());
     }
-    
+
+    LogPrintf("6. nCredit: %i\n", nCredit);
     int64_t blockValue = nCredit;
+    LogPrintf("1. blockValue: %i\n", blockValue);
     int64_t masternodePayment = GetMasternodePayment(pindexPrev->nHeight+1, nReward);
+    LogPrintf("masternodePayment: %i\n", masternodePayment);
 
     // Set output amount
     if(hasPayment && txNew.vout.size() == 4 && (payeerewardpercent == 0 || payeerewardpercent == 100)) // 2 stake outputs, stake was split, plus a masternode payment, no reward split
@@ -3615,6 +3623,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         blockValue -= masternodePayment;
         txNew.vout[1].nValue = blockValue;
     }
+    LogPrintf("2. blockValue: %i\n", blockValue);
     // Sign
     int nIn = 0;
     BOOST_FOREACH(const CWalletTx* pcoin, vwtxPrev)

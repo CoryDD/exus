@@ -411,17 +411,17 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
             //    DateTimeStrFormat("%x %H:%M:%S", wtx.GetBlockTime()),
             //    wtx.hashBlock.ToString(),
             //    wtx.mapValue["message"]);
-        } 
+        }
         else if (strType == "sxAddr")
         {
             if (fDebug)
                 printf("WalletDB ReadKeyValue sxAddr\n");
-            
+
             CStealthAddress sxAddr;
             ssValue >> sxAddr;
-            
+
             pwallet->stealthAddresses.insert(sxAddr);
-        } 
+        }
         else if (strType == "acentry")
         {
             string strAccount;
@@ -564,7 +564,7 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
         {
             if (fDebug)
                 printf("WalletDB ReadKeyValue sxKeyMeta\n");
-            
+
             CKeyID keyId;
             ssKey >> keyId;
             CStealthKeyMetadata sxKeyMeta;
@@ -731,7 +731,7 @@ DBErrors CWalletDB::LoadWallet(CWallet* pwallet)
     BOOST_FOREACH(CAccountingEntry& entry, pwallet->laccentries) {
         pwallet->wtxOrdered.insert(make_pair(entry.nOrderPos, CWallet::TxPair((CWalletTx*)0, &entry)));
     }
- 
+
     return result;
 }
 
